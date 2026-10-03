@@ -1,0 +1,116 @@
+# Paediatric AI-ECG Potassium Study — proposal page
+
+Live address: https://jamesdin1124.github.io/paed-aiecg-k/
+
+## What this page is
+
+A one-page summary of a proposed multinational study: external validation and
+adaptation of an adult AI-ECG potassium model in children. Pediatric teams
+reach it by scanning the QR code on the conference slide (Hong Kong,
+9 October 2026). A button on the page leads to a short Google Form survey.
+Under each button, a line gives the email address, for anyone who cannot open
+Google Forms.
+
+The QR code points to this page, not to the form, so the QR code never has to
+change. Only the button link changes.
+
+The page is a single file, `index.html`, with inline CSS and a few lines of
+inline JavaScript. It loads nothing from other sites (no fonts, scripts,
+images, logos, analytics or cookies) and is marked `noindex`, so search
+engines are asked not to list it. This README is public too: it is served at
+`/paed-aiecg-k/README.md`.
+
+## First publication (once)
+
+1. Create a **public** repository named `paed-aiecg-k` under the account
+   `jamesdin1124`.
+2. Put `index.html`, `.nojekyll` and this `README.md` at the root of the
+   default branch (`main`).
+3. Settings → Pages → Build and deployment → Source: **Deploy from a branch**;
+   Branch: `main`, folder `/ (root)`. Save.
+4. Wait at least 10 minutes. GitHub Pages pages are cached for up to
+   10 minutes, and a 404 seen before the first push is cached too.
+5. On a phone using mobile data (not Wi-Fi), open the live address in a
+   private tab. It must show this page, not a 404.
+6. Scan the QR code itself (projected slide and printed card) and check that
+   it opens this page.
+
+Everything pushed to a public repository stays in its history, even after a
+later change. Publish only text that has been approved.
+
+## How to set the survey link
+
+1. Open `index.html`.
+2. Near the top, inside the `<script>` block, find this line:
+
+   ```js
+   const SURVEY_URL = "";
+   ```
+
+3. From the Apps Script execution log, copy the line
+   **`1. Published URL`**. It looks like
+   `https://docs.google.com/forms/d/e/…/viewform`. A `https://forms.gle/…`
+   short link also works. **Never use `2. Edit URL`** (it ends in `/edit`):
+   it opens only for you, and everyone else sees a Google permission page.
+4. Paste it between the two straight quotes, for example:
+
+   ```js
+   const SURVEY_URL = "https://docs.google.com/forms/d/e/1FAIpQLS…/viewform";
+   ```
+
+   Edit on a computer if you can. Phone keyboards can turn `"` into curly
+   quotes (`“ ”`), which stop the script; the buttons then stay as email
+   buttons.
+5. Commit and push:
+
+   ```sh
+   git add index.html
+   git commit -m "Set survey link"
+   git push
+   ```
+
+6. Do this at least 60 minutes before the talk (cache, see above).
+7. Check the live page **in a private window, or on a device that is not
+   signed in to the Google account that owns the form**. The owner's own
+   browser opens even an Edit URL, so it hides that mistake.
+   - The button reads "Take the survey (2–3 minutes)".
+   - The line under it reads "If the survey does not open, email …".
+   - Tap the button and go on to the first question; no sign-in is asked.
+   - Scan the QR code with a phone camera and also from WeChat's scanner.
+
+If `SURVEY_URL` is empty, or is anything other than a form's Published URL
+(an Edit URL, an `http://` link, another site), the page ignores it: both
+buttons read "Survey opens soon — email us" and open an email to
+jamesdin1124@gmail.com, and the browser console says why.
+
+The button label "Take the survey (2–3 minutes)" is in the same `<script>`
+block. Change it there, and in the form description, if a timed test on a
+phone takes longer than 3 minutes.
+
+## Changing the text
+
+The study summary on this page is copied word for word from the approved
+summary that also appears at the top of the Google Form. If the summary
+changes, change both, then update the "Last updated" date at the bottom of
+`index.html`. Do not add claims or numbers that are not in the approved
+summary.
+
+## Data and privacy
+
+This page sets no cookies, runs no analytics or tracking code, and loads no
+third-party resources. A Content-Security-Policy in the page blocks any
+outside resource from loading. GitHub, which hosts the page, logs visitors'
+IP addresses for security (see GitHub's documentation, "About GitHub Pages",
+Data collection). The survey is a Google Form; it asks for professional
+contact details and about the respondent's hospital, and does not ask for
+patient data.
+
+## Maintainer
+
+Jhao-Jhuang Ding, MD — jamesdin1124@gmail.com
+
+## Files
+
+- `index.html` — the page
+- `.nojekyll` — tells GitHub Pages to serve the files as they are
+- `README.md` — this file

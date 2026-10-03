@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex">
+<title>Paediatric AI-ECG Potassium Study</title>
+<meta name="description" content="We invite pediatric nephrology and cardiology teams to help test an adult AI-ECG potassium model in children.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Paediatric AI-ECG Potassium Study">
+<meta property="og:description" content="We invite pediatric nephrology and cardiology teams to help test an adult AI-ECG potassium model in children.">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#0E6E6E" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0F181C" media="(prefers-color-scheme: dark)">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMwRTZFNkUiLz48cGF0aCBkPSJNNyAzNWgxM2w0LTkgNiAyMSA3LTMzIDYgMjFoMTQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSI1LjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjwvc3ZnPg==">
+<script>
+/* ------------------------------------------------------------------
+   SURVEY LINK: the only place to edit.
+   Paste the form's PUBLISHED URL between the two straight quotes on
+   the next line: https://docs.google.com/forms/d/e/.../viewform
+   (a https://forms.gle/... short link also works).
+   Never paste the Edit URL (.../edit): it opens only for the form owner.
+   Left empty, or any other value: both buttons stay
+   "Survey opens soon — email us" (the browser console says why).
+   ------------------------------------------------------------------ */
+const SURVEY_URL = "";
+
+document.addEventListener("DOMContentLoaded", function () {
+  /* drop spaces and stray straight or curly quotes picked up when pasting */
+  var url = String(SURVEY_URL).replace(/[\s"'\u2018\u2019\u201C\u201D]/g, "");
+  if (url === "") return; /* no link yet: keep the email buttons */
+  var published = /^https:\/\/(forms\.gle\/[A-Za-z0-9_-]+|docs\.google\.com\/forms(\/u\/\d+)?\/d\/e\/[A-Za-z0-9_-]+\/viewform)\/?(\?[^\s#]*)?$/;
+  if (!published.test(url)) {
+    console.warn("SURVEY_URL ignored: use the form's Published URL (.../viewform or forms.gle/...), not the Edit URL.", url);
+    return;
+  }
+  document.querySelectorAll("a[data-survey]").forEach(function (a) {
+    a.href = url;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    a.textContent = "Take the survey (2–3 minutes)";
+    var note = document.createElement("span");
+    note.className = "sr-only";
+    note.textContent = " (opens in a new tab)";
+    a.appendChild(note);
+  });
+  document.querySelectorAll("[data-alt]").forEach(function (s) {
+    s.textContent = "If the survey does not open, email";
+  });
+});
+</script>
+<style>
+:root {
+  --bg: #FFFFFF;
+  --ink: #1B2A34;
+  --muted: #4A5A64;
+  --accent: #0E6E6E;
+  --tint: #E3F1F0;
+  --tint-soft: #F1F7F7;
+  --rule: #D3E2E2;
+  --btn-bg: #0E6E6E;
+  --btn-bg-hover: #0A5656;
+  --btn-ink: #FFFFFF;
+  --focus: #0E6E6E;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0F181C;
+    --ink: #E8F0F1;
+    --muted: #AEBFC4;
+    --accent: #6CCBC0;
+    --tint: #16302F;
+    --tint-soft: #132426;
+    --rule: #2A3C41;
+    --btn-bg: #6CCBC0;
+    --btn-bg-hover: #8AD8CF;
+    --btn-ink: #062421;
+    --focus: #A8E6DF;
+    color-scheme: dark;
+  }
+}
+*, *::before, *::after { box-sizing: border-box; }
+html {
+  font-size: 112.5%; /* 18px when the browser default is 16px */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  font-size: 1rem;
+  line-height: 1.6;
+  border-top: 6px solid var(--accent);
+  overflow-wrap: break-word;
+}
+.wrap {
+  max-width: calc(30rem + 32px); /* about 65-70 characters per line */
+  margin: 0 auto;
+  padding: 0 16px;
+}
+.hero { padding-top: 28px; padding-bottom: 8px; }
+.kicker {
+  margin: 0 0 10px;
+  color: var(--accent);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: 1.4;
+}
+h1 {
+  margin: 0;
+  font-size: 1.75rem;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  font-weight: 750;
+}
+.worktitle {
+  margin: 16px 0 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+.worktitle .label { font-weight: 700; }
+.lead {
+  margin: 18px 0 0;
+  font-size: 1.15rem;
+  line-height: 1.5;
+}
+.cta { margin: 24px 0 0; }
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 24rem;
+  min-height: 56px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: var(--btn-bg);
+  color: var(--btn-ink);
+  font-weight: 700;
+  font-size: 1rem;
+  line-height: 1.3;
+  text-align: center;
+  text-decoration: none;
+  border: 2px solid transparent; /* shows as an outline in forced-colors mode */
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+}
+@media (hover: hover) { .btn:hover { background: var(--btn-bg-hover); } }
+.btn:active { background: var(--btn-bg-hover); }
+@media (forced-colors: active) { .btn { border-color: LinkText; } }
+.alt {
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+.cta-end .alt { text-align: center; }
+section {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid var(--rule);
+}
+h2 {
+  margin: 0 0 12px;
+  color: var(--accent);
+  font-size: 1.2rem;
+  line-height: 1.3;
+  font-weight: 700;
+}
+p { margin: 0 0 14px; }
+section > :last-child { margin-bottom: 0; }
+ul { margin: 0 0 14px; padding-left: 1.25em; }
+li { margin: 0 0 8px; padding-left: 0.2em; }
+li::marker { color: var(--accent); }
+ul.steps { list-style: none; padding: 0; }
+ul.steps li {
+  margin: 0 0 12px;
+  padding: 12px 14px;
+  border-left: 4px solid var(--accent);
+  border-radius: 0 10px 10px 0;
+  background: var(--tint-soft);
+}
+ul.steps li:last-child { margin-bottom: 0; }
+.callout {
+  padding: 14px 16px;
+  border-radius: 10px;
+  background: var(--tint);
+}
+.nowrap { white-space: nowrap; }
+.cta-end {
+  margin-top: 32px;
+  padding: 16px 12px;
+  border-radius: 14px;
+  background: var(--tint);
+}
+.cta-end .btn { margin: 0 auto; }
+a { color: var(--accent); text-underline-offset: 0.18em; }
+a.mail { display: inline-block; max-width: 100%; padding: 8px 0; min-height: 44px; overflow-wrap: anywhere; } /* 44 px touch target; may break on very large text */
+a:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+.btn:focus-visible { border-radius: 12px; }
+footer.wrap {
+  margin-top: 40px;
+  padding-bottom: 40px;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+.foot { padding-top: 20px; border-top: 1px solid var(--rule); }
+footer p { max-width: 34em; margin: 0 0 8px; }
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+@media (min-width: 720px) {
+  .hero { padding-top: 56px; }
+  h1 { font-size: 2.25rem; }
+  .kicker { margin-bottom: 14px; }
+  section { margin-top: 40px; padding-top: 28px; }
+  .cta-end { padding: 28px 24px; }
+}
+@media print {
+  :root {
+    --bg: #FFFFFF; --ink: #000000; --muted: #333333; --accent: #000000;
+    --tint: transparent; --tint-soft: transparent; --rule: #999999;
+    color-scheme: light;
+  }
+  html, body { background: #FFFFFF !important; }
+  @page { margin: 18mm 16mm; }
+  html { font-size: 11pt; }
+  body { border-top: 0; }
+  .wrap { max-width: none; padding: 0; }
+  .hero { padding-top: 0; }
+  .cta { display: none; }
+  .cta-end { margin-top: 18pt; padding: 0; border-radius: 0; }
+  .cta-end .alt { text-align: left; margin-top: 4pt; }
+  .btn {
+    display: inline; width: auto; max-width: none; min-height: 0;
+    padding: 0; border: 0; border-radius: 0; background: none; box-shadow: none;
+    color: #000000; font-weight: 700; text-decoration: none;
+  }
+  .btn[href^="mailto:"] { display: none; }
+  .cta-end:has(.btn[href^="mailto:"]) { display: none; }
+  .btn[href^="https:"]::after { content: ": " attr(href); font-weight: 400; }
+  .sr-only { display: none; }
+  a { color: #000000; text-decoration: none; }
+  a.mail { display: inline; padding: 0; min-height: 0; }
+  ul.steps li { border-left: 2px solid #999999; border-radius: 0; padding: 0 0 0 10px; }
+  .callout { padding: 0; }
+  h2 { break-after: avoid; page-break-after: avoid; }
+  li, .callout { break-inside: avoid; page-break-inside: avoid; }
+  section { margin-top: 14pt; padding-top: 10pt; }
+  footer.wrap { margin-top: 14pt; padding-bottom: 0; }
+  .foot { padding-top: 10pt; }
+}
+</style>
+</head>
+<body>
+<header class="wrap hero">
+  <p class="kicker" data-s="h">Study summary (draft, October 2026)</p>
+  <h1>Paediatric AI-ECG Potassium Study</h1>
+  <p class="lead">We invite pediatric nephrology and cardiology teams to help test an adult AI-ECG potassium model in children.</p>
+  <div class="cta">
+    <a class="btn" data-survey href="mailto:jamesdin1124@gmail.com?subject=Paediatric%20AI-ECG%20Potassium%20Study">Survey opens soon — email&nbsp;us</a>
+    <p class="alt"><span data-alt>Email:</span> <a class="mail" href="mailto:jamesdin1124@gmail.com?subject=Paediatric%20AI-ECG%20Potassium%20Study">jamesdin1124@gmail.com</a></p>
+  </div>
+  <p class="worktitle" data-s><span class="label">Working title:</span> External validation and adaptation of an adult AI-ECG potassium model in children: a multinational study.</p>
+</header>
+
+<main class="wrap">
+  <section aria-labelledby="h-why">
+    <h2 id="h-why" data-s="h">Why</h2>
+    <p data-s>An AI-ECG model (ECG12Net) estimates serum potassium from a standard <span class="nowrap">12-lead</span> ECG. Our collaborators at <span class="nowrap">Tri-Service</span> General Hospital and the National Defense Medical University, Taiwan, developed it from 66,321 emergency-department ECGs (Lin CS et al. JMIR Med Inform 2020).</p>
+    <p data-s>In 191 adults with severe hypokalemia, the ECG estimate tracked laboratory potassium within each patient (repeated-measures correlation 0.847; AUC 0.920). It was available a mean of 52.5 minutes before the laboratory report (Ding JJ et al. Am J Kidney Dis 2026).</p>
+    <p data-s>To our knowledge, no deep-learning potassium model has been validated in children. The pediatric ECG differs from the adult ECG, and each centre sees few hypokalemic children. Pooling across centres is therefore necessary.</p>
+  </section>
+
+  <section aria-labelledby="h-propose">
+    <h2 id="h-propose" data-s="h">What we propose</h2>
+    <ul class="steps" role="list">
+      <li data-s><strong>Step 1A (retrospective):</strong> apply the adult model, unchanged, to existing pediatric ECGs. Children aged 28 days to 17 years; records from 2019 to 2025; a digital <span class="nowrap">12-lead</span> ECG with a laboratory serum or plasma potassium within 60 minutes. Main outcome: accuracy for potassium <span class="nowrap">≤3.5 mmol/L</span>, by age band (&lt;1, 1–11, 12–17 years) and by cause (acute shift or chronic deficit).</li>
+      <li data-s><strong>Step 1B (only if needed):</strong> adapt the model on the pooled data, and test it on a site that it has not seen.</li>
+      <li data-s><strong>Step 2 (later, under a separate protocol):</strong> prospective monitoring during potassium correction.</li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="h-site">
+    <h2 id="h-site" data-s="h">What a site does in Step 1</h2>
+    <ul>
+      <li data-s>Obtains local ethics approval.</li>
+      <li data-s>Removes names, ID numbers and dates of birth before any data leave the hospital.</li>
+      <li data-s>Sends the de-identified data by secure transfer.</li>
+    </ul>
+    <p data-s>The analysis runs centrally in Taiwan. Each site receives its own results.</p>
+  </section>
+
+  <section aria-labelledby="h-target">
+    <h2 id="h-target" data-s="h">Target</h2>
+    <p class="callout" data-s>At least 150 hypokalemic and 450 normokalemic ECGs in total, pooled across all sites. There is no quota for any single site.</p>
+  </section>
+
+  <section aria-labelledby="h-agree">
+    <h2 id="h-agree" data-s="h">To be agreed with participating sites</h2>
+    <p data-s>The data transfer agreement, authorship rules (ICMJE criteria), the pre-specified success criteria, and the timeline.</p>
+  </section>
+
+  <div class="cta-end">
+    <a class="btn" data-survey href="mailto:jamesdin1124@gmail.com?subject=Paediatric%20AI-ECG%20Potassium%20Study">Survey opens soon — email&nbsp;us</a>
+    <p class="alt"><span data-alt>Email:</span> <a class="mail" href="mailto:jamesdin1124@gmail.com?subject=Paediatric%20AI-ECG%20Potassium%20Study">jamesdin1124@gmail.com</a></p>
+  </div>
+
+  <section aria-labelledby="h-next">
+    <h2 id="h-next">What happens next</h2>
+    <p>We will contact interested teams to finalize the protocol together.</p>
+  </section>
+
+  <section aria-labelledby="h-contact">
+    <h2 id="h-contact" data-s="h">Contact</h2>
+    <p data-s>Jhao-Jhuang Ding, MD — Division of Pediatric Nephrology, Chang Gung Memorial Hospital, Linkou, Taiwan — <a class="mail" href="mailto:jamesdin1124@gmail.com?subject=Paediatric%20AI-ECG%20Potassium%20Study">jamesdin1124@gmail.com</a></p>
+  </section>
+</main>
+
+<footer class="wrap">
+<div class="foot">
+  <p>Investigator-led proposal; not an official page of any hospital.</p>
+  <p>This page sets no cookies and has no analytics or tracking. GitHub, which hosts it, logs visitors' IP addresses for security. The survey is a Google Form. It asks for your professional contact details and about your hospital; it does not ask for patient data.</p>
+  <p>Last updated: <time datetime="2026-10-04">4 October 2026</time></p>
+</div>
+</footer>
+</body>
+</html>
