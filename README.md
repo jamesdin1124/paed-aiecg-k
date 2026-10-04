@@ -95,11 +95,45 @@ changes, change both, then update the "Last updated" date at the bottom of
 `index.html`. Do not add claims or numbers that are not in the approved
 summary.
 
+## Figures and links
+
+The three figures are original, hand-written inline SVG drawn for this page
+(no journal figure, visual abstract, logo or image file is used):
+
+1. What the model does: 12-lead ECG → AI-ECG model (ECG12Net) → ECG estimate
+   of serum potassium, compared with laboratory potassium; below it, the adult
+   numbers from the summary (no new numbers).
+2. The three steps: Step 1A → Step 1B (only if needed) → Step 2 (later, under
+   a separate protocol).
+3. How data move in Step 1: names, ID numbers and all dates removed at your
+   hospital → secure transfer → central analysis → each site receives its own
+   results.
+
+The wording on the figures is taken from the approved summary; they add no
+claim or number. Each figure has a
+narrow (stacked, for phones) and a wide version; CSS shows one of them.
+Colours come from the page's CSS variables, so both light and dark mode work.
+
+Links to the published papers open in a new tab. They are links the reader
+clicks, not resources the page loads. The Publications list gives author,
+journal and year only (no article titles):
+
+- Ding JJ et al. Am J Kidney Dis 2026 — https://doi.org/10.1053/j.ajkd.2026.05.020 ·
+  https://pubmed.ncbi.nlm.nih.gov/42595038/
+- Zhou X, Neyra JA. Editorial. Am J Kidney Dis 2026 —
+  https://doi.org/10.1053/j.ajkd.2026.08.003 · https://pubmed.ncbi.nlm.nih.gov/42801327/
+- Lin CS et al. (ECG12Net) JMIR Med Inform 2020, open access —
+  https://doi.org/10.2196/15931 · https://pubmed.ncbi.nlm.nih.gov/32134388/
+
+The two citations inside the summary link to the first and third DOI; their
+visible text is unchanged.
+
 ## Data and privacy
 
 This page sets no cookies, runs no analytics or tracking code, and loads no
 third-party resources. A Content-Security-Policy in the page blocks any
-outside resource from loading. GitHub, which hosts the page, logs visitors'
+outside resource from loading. The links to doi.org and PubMed are ordinary
+links: nothing is fetched from those sites unless the reader clicks one. GitHub, which hosts the page, logs visitors'
 IP addresses for security (see GitHub's documentation, "About GitHub Pages",
 Data collection). The survey is a Google Form; it asks for professional
 contact details and about the respondent's hospital, and does not ask for
