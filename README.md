@@ -148,3 +148,7 @@ Jhao-Jhuang Ding, MD — jamesdin1124@gmail.com
 - `index.html` — the page
 - `.nojekyll` — tells GitHub Pages to serve the files as they are
 - `README.md` — this file
+
+## Images for the Google Form
+
+`img/fig1_what_the_model_does.png`, `img/fig2_three_steps.png` and `img/fig3_how_data_move.png` are PNG exports of the three figures on this page (light theme, 2x). The Google Form shows them at the top (inserted by URL in the form editor). They are not loaded by `index.html`.
