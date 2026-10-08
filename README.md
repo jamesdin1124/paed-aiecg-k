@@ -14,9 +14,10 @@ Google Forms.
 The QR code points to this page, not to the form, so the QR code never has to
 change. Only the button link changes.
 
-The page is a single file, `index.html`, with inline CSS and a few lines of
-inline JavaScript. It loads nothing from other sites (no fonts, scripts,
-images, logos, analytics or cookies) and is marked `noindex`, so search
+The page is `index.html`, with inline CSS and a few lines of inline
+JavaScript, plus two figure images in `img/` from the same site
+(Figure 2 of the adult study, wide and stacked versions). It loads nothing
+from other sites (no fonts, scripts, images, logos, analytics or cookies) and is marked `noindex`, so search
 engines are asked not to list it. This README is public too: it is served at
 `/paed-aiecg-k/README.md`.
 
