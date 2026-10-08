@@ -16,6 +16,37 @@
 <meta name="theme-color" content="#0F181C" media="(prefers-color-scheme: dark)">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMwRTZFNkUiLz48cGF0aCBkPSJNNyAzNWgxM2w0LTkgNiAyMSA3LTMzIDYgMjFoMTQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSI1LjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjwvc3ZnPg==">
 <script>
+document.documentElement.classList.add("js");
+document.addEventListener("DOMContentLoaded", function () {
+  /* tabs: one panel at a time; arrow keys, Home and End move between tabs */
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('[role="tab"]'));
+  if (!tabs.length) return;
+  function show(i, focus) {
+    tabs.forEach(function (t, j) {
+      var on = j === i;
+      t.setAttribute("aria-selected", on ? "true" : "false");
+      t.tabIndex = on ? 0 : -1;
+      document.getElementById(t.getAttribute("aria-controls")).hidden = !on;
+    });
+    if (focus) tabs[i].focus();
+  }
+  tabs.forEach(function (t, i) {
+    t.addEventListener("click", function () { show(i, false); });
+    t.addEventListener("keydown", function (e) {
+      var k = { ArrowRight: i + 1, ArrowLeft: i - 1, Home: 0, End: tabs.length - 1 }[e.key];
+      if (k === undefined) return;
+      e.preventDefault();
+      show((k + tabs.length) % tabs.length, true);
+    });
+  });
+  document.querySelectorAll("[data-go]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      show(Number(b.getAttribute("data-go")) - 1, true);
+      document.getElementById("summary").scrollIntoView({ block: "start" });
+    });
+  });
+  show(0, false);
+});
 /* ------------------------------------------------------------------
    SURVEY LINK: the only place to edit.
    Paste the form's PUBLISHED URL between the two straight quotes on
@@ -170,7 +201,7 @@ footer p { max-width: 34em; margin: 0 0 8px; }
   border: 0;
 }
 /* Figures: original inline SVG. Narrow variant (.n) below 600 px, wide variant (.w) above. */
-.fig { margin: 20px 0 0; }
+.fig { margin: 20px 0 24px; }
 .fig svg { display: block; width: 100%; height: auto; }
 .fig .n { max-width: 420px; margin: 0 auto; }
 .fig .w { display: none; }
@@ -200,7 +231,30 @@ figcaption { margin-top: 10px; color: var(--muted); font-size: 0.9rem; line-heig
 .fig .hc { fill: var(--accent); }
 .fig .dg { fill: none; stroke: var(--ink); stroke-width: 2; }
 .fig.grid .n { max-width: 420px; }
-.fig.photo img { display: block; width: 100%; height: auto; margin: 0 0 12px; border-radius: 6px; background: #FFFFFF; }
+.fig.photo img { display: block; width: 100%; height: auto; margin: 0 0 12px; }
+/* Tabs: built in the markup; the script only switches them. Without the script, every panel shows and the tab bar stays hidden. */
+.tablist, .next { display: none; }
+html.js .tabs { margin-top: 36px; }
+html.js .tablist { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding-bottom: 14px; border-bottom: 1px solid var(--rule); }
+html.js .next { display: block; margin: 28px 0 0; }
+.tablist button, .next button {
+  min-height: 44px;
+  padding: 8px 14px;
+  border: 1.5px solid var(--rule);
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.95rem;
+  line-height: 1.3;
+  cursor: pointer;
+}
+.tablist button[aria-selected="true"] { border-color: var(--accent); background: var(--tint); color: var(--accent); font-weight: 700; }
+@media (hover: hover) { .tablist button:hover, .next button:hover { border-color: var(--accent); } }
+.next button { color: var(--accent); font-weight: 700; }
+.tablist button:focus-visible, .next button:focus-visible, .panel:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+html.js .panel > section:first-child { margin-top: 0; padding-top: 24px; border-top: 0; }
+@media (forced-colors: active) { .tablist button[aria-selected="true"] { border-width: 3px; } }
 .pubs { list-style: none; padding: 0; }
 .pubs li { margin: 0 0 16px; padding: 0; }
 .pubs li:last-child { margin-bottom: 0; }
@@ -241,6 +295,9 @@ figcaption { margin-top: 10px; color: var(--muted); font-size: 0.9rem; line-heig
   .cta-end:has(.btn[href^="mailto:"]) { display: none; }
   .btn[href^="https:"]::after { content: ": " attr(href); font-weight: 400; }
   .sr-only { display: none; }
+  .tablist, .next { display: none !important; }
+  .panel[hidden] { display: block !important; }
+  html.js .panel > section:first-child { margin-top: 14pt; padding-top: 10pt; border-top: 1px solid #999999; }
   a { color: #000000; text-decoration: none; }
   a.mail, .pubs .lk a { display: inline; padding: 0; min-height: 0; }
   h2 { break-after: avoid; page-break-after: avoid; }
@@ -257,346 +314,398 @@ figcaption { margin-top: 10px; color: var(--muted); font-size: 0.9rem; line-heig
   <p class="kicker" data-s="h">Study summary (draft, October 2026)</p>
   <h1>Paediatric AI-ECG Potassium Study</h1>
   <p class="lead">We invite pediatric nephrology and cardiology teams to help test an adult AI-ECG potassium model in children.</p>
-  <div class="cta">
-    <a class="btn" data-survey href="mailto:jamesdin1124@gmail.com?subject=Paediatric%20AI-ECG%20Potassium%20Study">Survey opens soon — email&nbsp;us</a>
-    <p class="alt"><span data-alt>Email:</span> <a class="mail" href="mailto:jamesdin1124@gmail.com?subject=Paediatric%20AI-ECG%20Potassium%20Study">jamesdin1124@gmail.com</a></p>
-  </div>
   <p class="worktitle" data-s><span class="label">Working title:</span> External validation and adaptation of an adult AI-ECG potassium model in children: a multinational study.</p>
 </header>
 
 <main class="wrap">
-  <section aria-labelledby="h-adult">
-    <h2 id="h-adult" data-s="h">In adults, the model is accurate</h2>
-    <p data-s>An AI-ECG model (ECG12Net) estimates serum potassium from a standard <span class="nowrap">12-lead</span> ECG. Our collaborators at <span class="nowrap">Tri-Service</span> General Hospital and the National Defense Medical University, Taiwan, developed it from 66,321 emergency-department ECGs (<a href="https://doi.org/10.2196/15931" target="_blank" rel="noopener noreferrer">Lin CS et al. JMIR Med Inform 2020<span class="sr-only"> (opens in a new tab)</span></a>).</p>
-    <p data-s>In adults, it is accurate across settings, even at the extremes. Since 2020, the team has published at least seven original papers on this model.</p>
-    <p data-s>In a test set of 13,222 ECGs, it flagged 95.6% of severe low potassium (≤2.5 mmol/L) as low, and 84.5% of severe high potassium (≥6.5 mmol/L) as high (<a href="https://doi.org/10.2196/15931" target="_blank" rel="noopener noreferrer">Lin CS et al. JMIR Med Inform 2020<span class="sr-only"> (opens in a new tab)</span></a>).</p>
-    <figure class="fig grid">
-      <svg class="n" viewBox="0 0 320 256" width="320" height="256" role="img" aria-labelledby="fan-t" aria-describedby="fan-d">
-        <title id="fan-t">Accuracy by potassium range</title>
-        <desc id="fan-d">Adapted from the ECG12Net development paper, test set of 13,222 ECGs. Each column is one range of laboratory potassium; each row is one range of the ECG estimate, in mmol/L. Each column adds to 100%. Same-range cells: 2.5 or less, 61%; 2.5 to 3.5, 43%; 3.5 to 5.5, 76%; 5.5 to 6.5, 34%; 6.5 or more, 46%. In the lowest column, 96% of estimates are 3.5 or less. In the highest column, 85% of estimates are 5.5 or more.</desc>
-        <g font-size="14" text-anchor="middle">
-          <text class="b" x="87.8" y="36">≤2.5</text>
-          <text class="b" x="139.4" y="18">2.5–</text>
-          <text class="b" x="139.4" y="36">3.5</text>
-          <text class="b" x="191" y="18">3.5–</text>
-          <text class="b" x="191" y="36">5.5</text>
-          <text class="b" x="242.6" y="18">5.5–</text>
-          <text class="b" x="242.6" y="36">6.5</text>
-          <text class="b" x="294.2" y="36">≥6.5</text>
-          <text class="b" x="54" y="77" text-anchor="end">≥6.5</text>
-          <rect class="hc" x="63.0" y="53" width="49.6" height="38" rx="4" fill-opacity="0.06"/>
-          <text x="87.8" y="77">0%</text>
-          <rect class="hc" x="114.6" y="53" width="49.6" height="38" rx="4" fill-opacity="0.06"/>
-          <text x="139.4" y="77">&lt;1%</text>
-          <rect class="hc" x="166.2" y="53" width="49.6" height="38" rx="4" fill-opacity="0.06"/>
-          <text x="191" y="77">&lt;1%</text>
-          <rect class="hc" x="217.8" y="53" width="49.6" height="38" rx="4" fill-opacity="0.12"/>
-          <text x="242.6" y="77">7%</text>
-          <rect class="hc" x="269.4" y="53" width="49.6" height="38" rx="4" fill-opacity="0.46"/>
-          <rect class="dg" x="270.4" y="54" width="47.6" height="36" rx="4"/>
-          <text x="294.2" y="77">46%</text>
-          <text class="b" x="54" y="117" text-anchor="end">5.5–6.5</text>
-          <rect class="hc" x="63.0" y="93" width="49.6" height="38" rx="4" fill-opacity="0.06"/>
-          <text x="87.8" y="117">0%</text>
-          <rect class="hc" x="114.6" y="93" width="49.6" height="38" rx="4" fill-opacity="0.07"/>
-          <text x="139.4" y="117">&lt;1%</text>
-          <rect class="hc" x="166.2" y="93" width="49.6" height="38" rx="4" fill-opacity="0.1"/>
-          <text x="191" y="117">5%</text>
-          <rect class="hc" x="217.8" y="93" width="49.6" height="38" rx="4" fill-opacity="0.35"/>
-          <rect class="dg" x="218.8" y="94" width="47.6" height="36" rx="4"/>
-          <text x="242.6" y="117">34%</text>
-          <rect class="hc" x="269.4" y="93" width="49.6" height="38" rx="4" fill-opacity="0.39"/>
-          <text x="294.2" y="117">38%</text>
-          <text class="b" x="54" y="157" text-anchor="end">3.5–5.5</text>
-          <rect class="hc" x="63.0" y="133" width="49.6" height="38" rx="4" fill-opacity="0.1"/>
-          <text x="87.8" y="157">4%</text>
-          <rect class="hc" x="114.6" y="133" width="49.6" height="38" rx="4" fill-opacity="0.49"/>
-          <text x="139.4" y="157">50%</text>
-          <rect class="hc" x="166.2" y="133" width="49.6" height="38" rx="4" fill-opacity="0.71"/>
-          <rect class="dg" x="167.2" y="134" width="47.6" height="36" rx="4"/>
-          <text class="on" x="191" y="157">76%</text>
-          <rect class="hc" x="217.8" y="133" width="49.6" height="38" rx="4" fill-opacity="0.53"/>
-          <text class="on" x="242.6" y="157">54%</text>
-          <rect class="hc" x="269.4" y="133" width="49.6" height="38" rx="4" fill-opacity="0.17"/>
-          <text x="294.2" y="157">13%</text>
-          <text class="b" x="54" y="197" text-anchor="end">2.5–3.5</text>
-          <rect class="hc" x="63.0" y="173" width="49.6" height="38" rx="4" fill-opacity="0.36"/>
-          <text x="87.8" y="197">35%</text>
-          <rect class="hc" x="114.6" y="173" width="49.6" height="38" rx="4" fill-opacity="0.43"/>
-          <rect class="dg" x="115.6" y="174" width="47.6" height="36" rx="4"/>
-          <text x="139.4" y="197">43%</text>
-          <rect class="hc" x="166.2" y="173" width="49.6" height="38" rx="4" fill-opacity="0.21"/>
-          <text x="191" y="197">18%</text>
-          <rect class="hc" x="217.8" y="173" width="49.6" height="38" rx="4" fill-opacity="0.1"/>
-          <text x="242.6" y="197">4%</text>
-          <rect class="hc" x="269.4" y="173" width="49.6" height="38" rx="4" fill-opacity="0.07"/>
-          <text x="294.2" y="197">1%</text>
-          <text class="b" x="54" y="237" text-anchor="end">≤2.5</text>
-          <rect class="hc" x="63.0" y="213" width="49.6" height="38" rx="4" fill-opacity="0.58"/>
-          <rect class="dg" x="64.0" y="214" width="47.6" height="36" rx="4"/>
-          <text class="on" x="87.8" y="237">61%</text>
-          <rect class="hc" x="114.6" y="213" width="49.6" height="38" rx="4" fill-opacity="0.11"/>
-          <text x="139.4" y="237">6%</text>
-          <rect class="hc" x="166.2" y="213" width="49.6" height="38" rx="4" fill-opacity="0.07"/>
-          <text x="191" y="237">&lt;1%</text>
-          <rect class="hc" x="217.8" y="213" width="49.6" height="38" rx="4" fill-opacity="0.06"/>
-          <text x="242.6" y="237">0%</text>
-          <rect class="hc" x="269.4" y="213" width="49.6" height="38" rx="4" fill-opacity="0.07"/>
-          <text x="294.2" y="237">1%</text>
-        </g>
-      </svg>
-      <svg class="w" viewBox="0 0 540 238" width="540" height="238" role="img" aria-labelledby="faw-t" aria-describedby="faw-d">
-        <title id="faw-t">Accuracy by potassium range</title>
-        <desc id="faw-d">Adapted from the ECG12Net development paper, test set of 13,222 ECGs. Each column is one range of laboratory potassium; each row is one range of the ECG estimate, in mmol/L. Each column adds to 100%. Same-range cells: 2.5 or less, 61%; 2.5 to 3.5, 43%; 3.5 to 5.5, 76%; 5.5 to 6.5, 34%; 6.5 or more, 46%. In the lowest column, 96% of estimates are 3.5 or less. In the highest column, 85% of estimates are 5.5 or more.</desc>
-        <g font-size="15" text-anchor="middle">
-          <text class="b" x="136.5" y="24">≤2.5</text>
-          <text class="b" x="225.5" y="24">2.5–3.5</text>
-          <text class="b" x="314.5" y="24">3.5–5.5</text>
-          <text class="b" x="403.5" y="24">5.5–6.5</text>
-          <text class="b" x="492.5" y="24">≥6.5</text>
-          <text class="b" x="84" y="59" text-anchor="end">≥6.5</text>
-          <rect class="hc" x="93" y="35" width="87" height="38" rx="4" fill-opacity="0.06"/>
-          <text x="136.5" y="59">0%</text>
-          <rect class="hc" x="182" y="35" width="87" height="38" rx="4" fill-opacity="0.06"/>
-          <text x="225.5" y="59">&lt;1%</text>
-          <rect class="hc" x="271" y="35" width="87" height="38" rx="4" fill-opacity="0.06"/>
-          <text x="314.5" y="59">&lt;1%</text>
-          <rect class="hc" x="360" y="35" width="87" height="38" rx="4" fill-opacity="0.12"/>
-          <text x="403.5" y="59">7%</text>
-          <rect class="hc" x="449" y="35" width="87" height="38" rx="4" fill-opacity="0.46"/>
-          <rect class="dg" x="450" y="36" width="85" height="36" rx="4"/>
-          <text x="492.5" y="59">46%</text>
-          <text class="b" x="84" y="99" text-anchor="end">5.5–6.5</text>
-          <rect class="hc" x="93" y="75" width="87" height="38" rx="4" fill-opacity="0.06"/>
-          <text x="136.5" y="99">0%</text>
-          <rect class="hc" x="182" y="75" width="87" height="38" rx="4" fill-opacity="0.07"/>
-          <text x="225.5" y="99">&lt;1%</text>
-          <rect class="hc" x="271" y="75" width="87" height="38" rx="4" fill-opacity="0.1"/>
-          <text x="314.5" y="99">5%</text>
-          <rect class="hc" x="360" y="75" width="87" height="38" rx="4" fill-opacity="0.35"/>
-          <rect class="dg" x="361" y="76" width="85" height="36" rx="4"/>
-          <text x="403.5" y="99">34%</text>
-          <rect class="hc" x="449" y="75" width="87" height="38" rx="4" fill-opacity="0.39"/>
-          <text x="492.5" y="99">38%</text>
-          <text class="b" x="84" y="139" text-anchor="end">3.5–5.5</text>
-          <rect class="hc" x="93" y="115" width="87" height="38" rx="4" fill-opacity="0.1"/>
-          <text x="136.5" y="139">4%</text>
-          <rect class="hc" x="182" y="115" width="87" height="38" rx="4" fill-opacity="0.49"/>
-          <text x="225.5" y="139">50%</text>
-          <rect class="hc" x="271" y="115" width="87" height="38" rx="4" fill-opacity="0.71"/>
-          <rect class="dg" x="272" y="116" width="85" height="36" rx="4"/>
-          <text class="on" x="314.5" y="139">76%</text>
-          <rect class="hc" x="360" y="115" width="87" height="38" rx="4" fill-opacity="0.53"/>
-          <text class="on" x="403.5" y="139">54%</text>
-          <rect class="hc" x="449" y="115" width="87" height="38" rx="4" fill-opacity="0.17"/>
-          <text x="492.5" y="139">13%</text>
-          <text class="b" x="84" y="179" text-anchor="end">2.5–3.5</text>
-          <rect class="hc" x="93" y="155" width="87" height="38" rx="4" fill-opacity="0.36"/>
-          <text x="136.5" y="179">35%</text>
-          <rect class="hc" x="182" y="155" width="87" height="38" rx="4" fill-opacity="0.43"/>
-          <rect class="dg" x="183" y="156" width="85" height="36" rx="4"/>
-          <text x="225.5" y="179">43%</text>
-          <rect class="hc" x="271" y="155" width="87" height="38" rx="4" fill-opacity="0.21"/>
-          <text x="314.5" y="179">18%</text>
-          <rect class="hc" x="360" y="155" width="87" height="38" rx="4" fill-opacity="0.1"/>
-          <text x="403.5" y="179">4%</text>
-          <rect class="hc" x="449" y="155" width="87" height="38" rx="4" fill-opacity="0.07"/>
-          <text x="492.5" y="179">1%</text>
-          <text class="b" x="84" y="219" text-anchor="end">≤2.5</text>
-          <rect class="hc" x="93" y="195" width="87" height="38" rx="4" fill-opacity="0.58"/>
-          <rect class="dg" x="94" y="196" width="85" height="36" rx="4"/>
-          <text class="on" x="136.5" y="219">61%</text>
-          <rect class="hc" x="182" y="195" width="87" height="38" rx="4" fill-opacity="0.11"/>
-          <text x="225.5" y="219">6%</text>
-          <rect class="hc" x="271" y="195" width="87" height="38" rx="4" fill-opacity="0.07"/>
-          <text x="314.5" y="219">&lt;1%</text>
-          <rect class="hc" x="360" y="195" width="87" height="38" rx="4" fill-opacity="0.06"/>
-          <text x="403.5" y="219">0%</text>
-          <rect class="hc" x="449" y="195" width="87" height="38" rx="4" fill-opacity="0.07"/>
-          <text x="492.5" y="219">1%</text>
-        </g>
-      </svg>
-      <figcaption>Columns: laboratory potassium. Rows: ECG estimate. Both in mmol/L. Each column adds to 100%; outlined cells are the same range. Test set, 13,222 ECGs. Adapted from Lin CS et al. JMIR Med Inform 2020, Figure 3A (CC BY 4.0).</figcaption>
-    </figure>
-  </section>
+  <div class="tabs" id="summary">
+    <div class="tablist" role="tablist" aria-label="Study summary sections">
+      <button type="button" role="tab" id="tab-1" aria-controls="panel-1" aria-selected="true">1. Adult evidence</button>
+      <button type="button" role="tab" id="tab-2" aria-controls="panel-2" aria-selected="false" tabindex="-1">2. The pediatric study</button>
+    </div>
+    <div class="panel" role="tabpanel" id="panel-1" aria-labelledby="tab-1" tabindex="0">
+    <section aria-labelledby="h-adult">
+      <h2 id="h-adult" data-s="h">In adults, the model is accurate</h2>
+      <p data-s>An AI-ECG model (ECG12Net) estimates serum potassium from a standard <span class="nowrap">12-lead</span> ECG. Our collaborators at <span class="nowrap">Tri-Service</span> General Hospital and the National Defense Medical University, Taiwan, developed it from 66,321 emergency-department ECGs (<a href="https://doi.org/10.2196/15931" target="_blank" rel="noopener noreferrer">Lin CS et al. JMIR Med Inform 2020<span class="sr-only"> (opens in a new tab)</span></a>).</p>
+      <p data-s>In adults, it is accurate across settings, even at the extremes. Since 2020, the team has published at least seven original papers on this model.</p>
+      <p data-s>In a test set of 13,222 ECGs, it flagged 95.6% of severe low potassium (≤2.5 mmol/L) as low, and 84.5% of severe high potassium (≥6.5 mmol/L) as high (<a href="https://doi.org/10.2196/15931" target="_blank" rel="noopener noreferrer">Lin CS et al. JMIR Med Inform 2020<span class="sr-only"> (opens in a new tab)</span></a>).</p>
+      <figure class="fig grid">
+        <svg class="n" viewBox="0 0 320 256" width="320" height="256" role="img" aria-labelledby="fan-t" aria-describedby="fan-d">
+          <title id="fan-t">Accuracy by potassium range</title>
+          <desc id="fan-d">Adapted from the ECG12Net development paper, test set of 13,222 ECGs. Each column is one range of laboratory potassium; each row is one range of the ECG estimate, in mmol/L. Each column adds to 100%. Same-range cells: 2.5 or less, 61%; 2.5 to 3.5, 43%; 3.5 to 5.5, 76%; 5.5 to 6.5, 34%; 6.5 or more, 46%. In the lowest column, 96% of estimates are 3.5 or less. In the highest column, 85% of estimates are 5.5 or more.</desc>
+          <g font-size="14" text-anchor="middle">
+            <text class="b" x="87.8" y="36">≤2.5</text>
+            <text class="b" x="139.4" y="18">2.5–</text>
+            <text class="b" x="139.4" y="36">3.5</text>
+            <text class="b" x="191" y="18">3.5–</text>
+            <text class="b" x="191" y="36">5.5</text>
+            <text class="b" x="242.6" y="18">5.5–</text>
+            <text class="b" x="242.6" y="36">6.5</text>
+            <text class="b" x="294.2" y="36">≥6.5</text>
+            <text class="b" x="54" y="77" text-anchor="end">≥6.5</text>
+            <rect class="hc" x="63.0" y="53" width="49.6" height="38" rx="4" fill-opacity="0.06"/>
+            <text x="87.8" y="77">0%</text>
+            <rect class="hc" x="114.6" y="53" width="49.6" height="38" rx="4" fill-opacity="0.06"/>
+            <text x="139.4" y="77">&lt;1%</text>
+            <rect class="hc" x="166.2" y="53" width="49.6" height="38" rx="4" fill-opacity="0.06"/>
+            <text x="191" y="77">&lt;1%</text>
+            <rect class="hc" x="217.8" y="53" width="49.6" height="38" rx="4" fill-opacity="0.12"/>
+            <text x="242.6" y="77">7%</text>
+            <rect class="hc" x="269.4" y="53" width="49.6" height="38" rx="4" fill-opacity="0.46"/>
+            <rect class="dg" x="270.4" y="54" width="47.6" height="36" rx="4"/>
+            <text x="294.2" y="77">46%</text>
+            <text class="b" x="54" y="117" text-anchor="end">5.5–6.5</text>
+            <rect class="hc" x="63.0" y="93" width="49.6" height="38" rx="4" fill-opacity="0.06"/>
+            <text x="87.8" y="117">0%</text>
+            <rect class="hc" x="114.6" y="93" width="49.6" height="38" rx="4" fill-opacity="0.07"/>
+            <text x="139.4" y="117">&lt;1%</text>
+            <rect class="hc" x="166.2" y="93" width="49.6" height="38" rx="4" fill-opacity="0.1"/>
+            <text x="191" y="117">5%</text>
+            <rect class="hc" x="217.8" y="93" width="49.6" height="38" rx="4" fill-opacity="0.35"/>
+            <rect class="dg" x="218.8" y="94" width="47.6" height="36" rx="4"/>
+            <text x="242.6" y="117">34%</text>
+            <rect class="hc" x="269.4" y="93" width="49.6" height="38" rx="4" fill-opacity="0.39"/>
+            <text x="294.2" y="117">38%</text>
+            <text class="b" x="54" y="157" text-anchor="end">3.5–5.5</text>
+            <rect class="hc" x="63.0" y="133" width="49.6" height="38" rx="4" fill-opacity="0.1"/>
+            <text x="87.8" y="157">4%</text>
+            <rect class="hc" x="114.6" y="133" width="49.6" height="38" rx="4" fill-opacity="0.49"/>
+            <text x="139.4" y="157">50%</text>
+            <rect class="hc" x="166.2" y="133" width="49.6" height="38" rx="4" fill-opacity="0.71"/>
+            <rect class="dg" x="167.2" y="134" width="47.6" height="36" rx="4"/>
+            <text class="on" x="191" y="157">76%</text>
+            <rect class="hc" x="217.8" y="133" width="49.6" height="38" rx="4" fill-opacity="0.53"/>
+            <text class="on" x="242.6" y="157">54%</text>
+            <rect class="hc" x="269.4" y="133" width="49.6" height="38" rx="4" fill-opacity="0.17"/>
+            <text x="294.2" y="157">13%</text>
+            <text class="b" x="54" y="197" text-anchor="end">2.5–3.5</text>
+            <rect class="hc" x="63.0" y="173" width="49.6" height="38" rx="4" fill-opacity="0.36"/>
+            <text x="87.8" y="197">35%</text>
+            <rect class="hc" x="114.6" y="173" width="49.6" height="38" rx="4" fill-opacity="0.43"/>
+            <rect class="dg" x="115.6" y="174" width="47.6" height="36" rx="4"/>
+            <text x="139.4" y="197">43%</text>
+            <rect class="hc" x="166.2" y="173" width="49.6" height="38" rx="4" fill-opacity="0.21"/>
+            <text x="191" y="197">18%</text>
+            <rect class="hc" x="217.8" y="173" width="49.6" height="38" rx="4" fill-opacity="0.1"/>
+            <text x="242.6" y="197">4%</text>
+            <rect class="hc" x="269.4" y="173" width="49.6" height="38" rx="4" fill-opacity="0.07"/>
+            <text x="294.2" y="197">1%</text>
+            <text class="b" x="54" y="237" text-anchor="end">≤2.5</text>
+            <rect class="hc" x="63.0" y="213" width="49.6" height="38" rx="4" fill-opacity="0.58"/>
+            <rect class="dg" x="64.0" y="214" width="47.6" height="36" rx="4"/>
+            <text class="on" x="87.8" y="237">61%</text>
+            <rect class="hc" x="114.6" y="213" width="49.6" height="38" rx="4" fill-opacity="0.11"/>
+            <text x="139.4" y="237">6%</text>
+            <rect class="hc" x="166.2" y="213" width="49.6" height="38" rx="4" fill-opacity="0.07"/>
+            <text x="191" y="237">&lt;1%</text>
+            <rect class="hc" x="217.8" y="213" width="49.6" height="38" rx="4" fill-opacity="0.06"/>
+            <text x="242.6" y="237">0%</text>
+            <rect class="hc" x="269.4" y="213" width="49.6" height="38" rx="4" fill-opacity="0.07"/>
+            <text x="294.2" y="237">1%</text>
+          </g>
+        </svg>
+        <svg class="w" viewBox="0 0 540 238" width="540" height="238" role="img" aria-labelledby="faw-t" aria-describedby="faw-d">
+          <title id="faw-t">Accuracy by potassium range</title>
+          <desc id="faw-d">Adapted from the ECG12Net development paper, test set of 13,222 ECGs. Each column is one range of laboratory potassium; each row is one range of the ECG estimate, in mmol/L. Each column adds to 100%. Same-range cells: 2.5 or less, 61%; 2.5 to 3.5, 43%; 3.5 to 5.5, 76%; 5.5 to 6.5, 34%; 6.5 or more, 46%. In the lowest column, 96% of estimates are 3.5 or less. In the highest column, 85% of estimates are 5.5 or more.</desc>
+          <g font-size="15" text-anchor="middle">
+            <text class="b" x="136.5" y="24">≤2.5</text>
+            <text class="b" x="225.5" y="24">2.5–3.5</text>
+            <text class="b" x="314.5" y="24">3.5–5.5</text>
+            <text class="b" x="403.5" y="24">5.5–6.5</text>
+            <text class="b" x="492.5" y="24">≥6.5</text>
+            <text class="b" x="84" y="59" text-anchor="end">≥6.5</text>
+            <rect class="hc" x="93" y="35" width="87" height="38" rx="4" fill-opacity="0.06"/>
+            <text x="136.5" y="59">0%</text>
+            <rect class="hc" x="182" y="35" width="87" height="38" rx="4" fill-opacity="0.06"/>
+            <text x="225.5" y="59">&lt;1%</text>
+            <rect class="hc" x="271" y="35" width="87" height="38" rx="4" fill-opacity="0.06"/>
+            <text x="314.5" y="59">&lt;1%</text>
+            <rect class="hc" x="360" y="35" width="87" height="38" rx="4" fill-opacity="0.12"/>
+            <text x="403.5" y="59">7%</text>
+            <rect class="hc" x="449" y="35" width="87" height="38" rx="4" fill-opacity="0.46"/>
+            <rect class="dg" x="450" y="36" width="85" height="36" rx="4"/>
+            <text x="492.5" y="59">46%</text>
+            <text class="b" x="84" y="99" text-anchor="end">5.5–6.5</text>
+            <rect class="hc" x="93" y="75" width="87" height="38" rx="4" fill-opacity="0.06"/>
+            <text x="136.5" y="99">0%</text>
+            <rect class="hc" x="182" y="75" width="87" height="38" rx="4" fill-opacity="0.07"/>
+            <text x="225.5" y="99">&lt;1%</text>
+            <rect class="hc" x="271" y="75" width="87" height="38" rx="4" fill-opacity="0.1"/>
+            <text x="314.5" y="99">5%</text>
+            <rect class="hc" x="360" y="75" width="87" height="38" rx="4" fill-opacity="0.35"/>
+            <rect class="dg" x="361" y="76" width="85" height="36" rx="4"/>
+            <text x="403.5" y="99">34%</text>
+            <rect class="hc" x="449" y="75" width="87" height="38" rx="4" fill-opacity="0.39"/>
+            <text x="492.5" y="99">38%</text>
+            <text class="b" x="84" y="139" text-anchor="end">3.5–5.5</text>
+            <rect class="hc" x="93" y="115" width="87" height="38" rx="4" fill-opacity="0.1"/>
+            <text x="136.5" y="139">4%</text>
+            <rect class="hc" x="182" y="115" width="87" height="38" rx="4" fill-opacity="0.49"/>
+            <text x="225.5" y="139">50%</text>
+            <rect class="hc" x="271" y="115" width="87" height="38" rx="4" fill-opacity="0.71"/>
+            <rect class="dg" x="272" y="116" width="85" height="36" rx="4"/>
+            <text class="on" x="314.5" y="139">76%</text>
+            <rect class="hc" x="360" y="115" width="87" height="38" rx="4" fill-opacity="0.53"/>
+            <text class="on" x="403.5" y="139">54%</text>
+            <rect class="hc" x="449" y="115" width="87" height="38" rx="4" fill-opacity="0.17"/>
+            <text x="492.5" y="139">13%</text>
+            <text class="b" x="84" y="179" text-anchor="end">2.5–3.5</text>
+            <rect class="hc" x="93" y="155" width="87" height="38" rx="4" fill-opacity="0.36"/>
+            <text x="136.5" y="179">35%</text>
+            <rect class="hc" x="182" y="155" width="87" height="38" rx="4" fill-opacity="0.43"/>
+            <rect class="dg" x="183" y="156" width="85" height="36" rx="4"/>
+            <text x="225.5" y="179">43%</text>
+            <rect class="hc" x="271" y="155" width="87" height="38" rx="4" fill-opacity="0.21"/>
+            <text x="314.5" y="179">18%</text>
+            <rect class="hc" x="360" y="155" width="87" height="38" rx="4" fill-opacity="0.1"/>
+            <text x="403.5" y="179">4%</text>
+            <rect class="hc" x="449" y="155" width="87" height="38" rx="4" fill-opacity="0.07"/>
+            <text x="492.5" y="179">1%</text>
+            <text class="b" x="84" y="219" text-anchor="end">≤2.5</text>
+            <rect class="hc" x="93" y="195" width="87" height="38" rx="4" fill-opacity="0.58"/>
+            <rect class="dg" x="94" y="196" width="85" height="36" rx="4"/>
+            <text class="on" x="136.5" y="219">61%</text>
+            <rect class="hc" x="182" y="195" width="87" height="38" rx="4" fill-opacity="0.11"/>
+            <text x="225.5" y="219">6%</text>
+            <rect class="hc" x="271" y="195" width="87" height="38" rx="4" fill-opacity="0.07"/>
+            <text x="314.5" y="219">&lt;1%</text>
+            <rect class="hc" x="360" y="195" width="87" height="38" rx="4" fill-opacity="0.06"/>
+            <text x="403.5" y="219">0%</text>
+            <rect class="hc" x="449" y="195" width="87" height="38" rx="4" fill-opacity="0.07"/>
+            <text x="492.5" y="219">1%</text>
+          </g>
+        </svg>
+        <figcaption>Columns: laboratory potassium. Rows: ECG estimate. Both in mmol/L. Each column adds to 100%; outlined cells are the same range. Test set, 13,222 ECGs. Adapted from Lin CS et al. JMIR Med Inform 2020, Figure 3A (CC BY 4.0).</figcaption>
+      </figure>
+    </section>
+    <section aria-labelledby="h-trend">
+      <h2 id="h-trend" data-s="h">During treatment, the ECG follows potassium</h2>
+      <p class="goal" data-s>Our study showed that, during treatment of severe hypokalemia, the ECG follows the potassium trend in real time. The estimate is ready as soon as the ECG is recorded.</p>
+      <figure class="fig">
+        <svg class="n" viewBox="0 0 320 308" width="320" height="308" role="img" aria-labelledby="fgn-t" aria-describedby="fgn-d">
+          <title id="fgn-t">During treatment: the ECG and blood tests follow the same trend</title>
+          <desc id="fgn-d">Illustration, not patient data. Dots are ECG estimates of potassium, one per ECG. Hollow squares are blood tests: fewer, and each result arrives some time after the sample is taken. Both follow the same trend. Potassium starts below 3.5 mmol/L and rises during correction, then rebounds suddenly above 5.5 mmol/L. A blood test confirms it, then the team treats.</desc>
+          <g font-size="15">
+            <circle class="dot" cx="10" cy="16" r="5"/>
+            <text class="m" x="22" y="21">One dot = one ECG estimate</text>
+            <rect class="lab" x="5" y="33" width="10" height="10"/>
+            <text class="m" x="22" y="43">Blood test, reported later</text>
+            <line class="th" x1="4" y1="98.0" x2="316" y2="98.0"/>
+            <text class="m" x="4" y="90.0">5.5 mmol/L</text>
+            <line class="th" x1="4" y1="170.0" x2="316" y2="170.0"/>
+            <text class="m" x="4" y="162.0">3.5 mmol/L</text>
+            <polyline class="tr" points="30,209.6 57,206.0 84,198.8 111,191.6 138,180.8 165,170.0 192,137.6 219,87.2 246,112.4 273,130.4 300,137.6"/>
+            <polyline class="lt" points="48.9,213.2 129.9,195.2 237.9,83.6 291.9,126.8"/>
+            <g class="dot"><circle cx="30" cy="209.6" r="5"/><circle cx="57" cy="206.0" r="5"/><circle cx="84" cy="198.8" r="5"/><circle cx="111" cy="191.6" r="5"/><circle cx="138" cy="180.8" r="5"/><circle cx="165" cy="170.0" r="5"/><circle cx="192" cy="137.6" r="5"/><circle cx="219" cy="87.2" r="5"/><circle cx="246" cy="112.4" r="5"/><circle cx="273" cy="130.4" r="5"/><circle cx="300" cy="137.6" r="5"/></g>
+            <line class="lag" x1="30" y1="213.2" x2="42.9" y2="213.2"/>
+            <rect class="lab" x="43.9" y="208.2" width="10" height="10"/>
+            <line class="lag" x1="111" y1="195.2" x2="123.9" y2="195.2"/>
+            <rect class="lab" x="124.9" y="190.2" width="10" height="10"/>
+            <line class="lag" x1="219" y1="83.6" x2="231.9" y2="83.6"/>
+            <rect class="lab" x="232.9" y="78.6" width="10" height="10"/>
+            <line class="lag" x1="273" y1="126.8" x2="285.9" y2="126.8"/>
+            <rect class="lab" x="286.9" y="121.8" width="10" height="10"/>
+            <circle class="ring" cx="219" cy="87.2" r="11"/>
+            <text class="b" x="203" y="68" text-anchor="end">Sudden rebound</text>
+            <line class="dl" x1="219" y1="101.2" x2="219" y2="218"/>
+            <path class="lk" d="M214 224v18a5 5 0 0 0 10 0v-18m-13 0h16m-13 10h10"/>
+            <line class="ax" x1="4" y1="254" x2="316" y2="254"/>
+            <text class="m" x="4" y="274">Time</text>
+            <text class="b" x="219" y="276" text-anchor="middle">Blood test confirms,</text>
+            <text class="b" x="219" y="298" text-anchor="middle">then treat</text>
+          </g>
+        </svg>
+        <svg class="w" viewBox="0 0 540 256" width="540" height="256" role="img" aria-labelledby="fgw-t" aria-describedby="fgw-d">
+          <title id="fgw-t">During treatment: the ECG and blood tests follow the same trend</title>
+          <desc id="fgw-d">Illustration, not patient data. Dots are ECG estimates of potassium, one per ECG. Hollow squares are blood tests: fewer, and each result arrives some time after the sample is taken. Both follow the same trend. Potassium starts below 3.5 mmol/L and rises during correction, then rebounds suddenly above 5.5 mmol/L. A blood test confirms it, then the team treats.</desc>
+          <g font-size="15">
+            <circle class="dot" cx="10" cy="16" r="5"/>
+            <text class="m" x="22" y="21">One dot = one ECG estimate</text>
+            <rect class="lab" x="267" y="11" width="10" height="10"/>
+            <text class="m" x="284" y="21">Blood test, reported later</text>
+            <line class="th" x1="4" y1="77.0" x2="536" y2="77.0"/>
+            <text class="m" x="4" y="69.0">5.5 mmol/L</text>
+            <line class="th" x1="4" y1="153.0" x2="536" y2="153.0"/>
+            <text class="m" x="4" y="145.0">3.5 mmol/L</text>
+            <polyline class="tr" points="70,194.8 114,191.0 158,183.4 202,175.8 246,164.4 290,153.0 334,118.8 378,65.6 422,92.2 466,111.2 510,118.8"/>
+            <polyline class="lt" points="100.8,198.6 232.8,179.6 408.8,61.8 496.8,107.4"/>
+            <g class="dot"><circle cx="70" cy="194.8" r="5"/><circle cx="114" cy="191.0" r="5"/><circle cx="158" cy="183.4" r="5"/><circle cx="202" cy="175.8" r="5"/><circle cx="246" cy="164.4" r="5"/><circle cx="290" cy="153.0" r="5"/><circle cx="334" cy="118.8" r="5"/><circle cx="378" cy="65.6" r="5"/><circle cx="422" cy="92.2" r="5"/><circle cx="466" cy="111.2" r="5"/><circle cx="510" cy="118.8" r="5"/></g>
+            <line class="lag" x1="70" y1="198.6" x2="94.8" y2="198.6"/>
+            <rect class="lab" x="95.8" y="193.6" width="10" height="10"/>
+            <line class="lag" x1="202" y1="179.6" x2="226.8" y2="179.6"/>
+            <rect class="lab" x="227.8" y="174.6" width="10" height="10"/>
+            <line class="lag" x1="378" y1="61.8" x2="402.8" y2="61.8"/>
+            <rect class="lab" x="403.8" y="56.8" width="10" height="10"/>
+            <line class="lag" x1="466" y1="107.4" x2="490.8" y2="107.4"/>
+            <rect class="lab" x="491.8" y="102.4" width="10" height="10"/>
+            <circle class="ring" cx="378" cy="65.6" r="11"/>
+            <text class="b" x="362" y="48" text-anchor="end">Sudden rebound</text>
+            <line class="dl" x1="378" y1="79.6" x2="378" y2="186"/>
+            <path class="lk" d="M373 192v18a5 5 0 0 0 10 0v-18m-13 0h16m-13 10h10"/>
+            <line class="ax" x1="4" y1="224" x2="536" y2="224"/>
+            <text class="m" x="4" y="248">Time</text>
+            <text class="b" x="378" y="248" text-anchor="middle">Blood test confirms, then treat</text>
+          </g>
+        </svg>
+        <figcaption>Illustration, not patient data.</figcaption>
+      </figure>
+      <p data-s>In 191 adults with severe hypokalemia, the ECG estimate tracked laboratory potassium within each patient (repeated-measures correlation 0.847; AUC 0.920). It was available a mean of 52.5 minutes before the laboratory report (<a href="https://doi.org/10.1053/j.ajkd.2026.05.020" target="_blank" rel="noopener noreferrer">Ding JJ et al. Am J Kidney Dis 2026<span class="sr-only"> (opens in a new tab)</span></a>).</p>
+      <p data-s>In 2 patients whose potassium rebounded above the normal range during correction, the ECG flagged the rebound a mean of 41.6 minutes before the laboratory report.</p>
 
-  <section aria-labelledby="h-trend">
-    <h2 id="h-trend" data-s="h">During treatment, the ECG follows potassium</h2>
-    <p class="goal" data-s>Our study showed that, during treatment of severe hypokalemia, the ECG follows the potassium trend in real time. The estimate is ready as soon as the ECG is recorded.</p>
-    <p data-s>In 191 adults with severe hypokalemia, the ECG estimate tracked laboratory potassium within each patient (repeated-measures correlation 0.847; AUC 0.920). It was available a mean of 52.5 minutes before the laboratory report (<a href="https://doi.org/10.1053/j.ajkd.2026.05.020" target="_blank" rel="noopener noreferrer">Ding JJ et al. Am J Kidney Dis 2026<span class="sr-only"> (opens in a new tab)</span></a>).</p>
-
-    <figure class="fig photo">
-      <picture>
-        <source media="(min-width: 600px)" srcset="img/ajkd2026_fig2_pooled.png" width="1430" height="616">
-        <img src="img/ajkd2026_fig2_pooled_stacked.png" width="1089" height="1914" alt="Panel A: scatter plot of laboratory potassium against the ECG estimate, 466 pairs from 191 adults, with the identity line; repeated-measures correlation 0.847. Panel B: Bland-Altman plot; mean difference, laboratory minus ECG, -0.301 mmol/L; limits of agreement -1.194 to 0.592 mmol/L.">
-      </picture>
-      <figcaption>Adapted from Figure 2 of Ding JJ et al. Am J Kidney Dis 2026, by the authors; acute and chronic causes pooled. A: ECG estimate and laboratory potassium, 466 pairs from 191 adults during treatment. B: Bland-Altman plot.</figcaption>
-    </figure>
-  </section>
-
-
-  <section aria-labelledby="h-why">
-    <h2 id="h-why" data-s="h">Why several centres</h2>
-    <p data-s>To our knowledge, no deep-learning potassium model has been validated in children. The pediatric ECG differs from the adult ECG. Each centre sees few hypokalemic children, and severe values are rarer still. Pooling across centres is therefore necessary.</p>
-  </section>
-
-  <section aria-labelledby="h-start">
-    <h2 id="h-start" data-s="h">We start from the adult model</h2>
-    <ul>
-      <li data-s><strong>Step 1A (retrospective):</strong> apply the adult model, unchanged, to existing pediatric ECGs. Children aged 28 days to 17 years; records from 2019 to 2025; a digital <span class="nowrap">12-lead</span> ECG with a laboratory serum or plasma potassium within 60 minutes. Main outcome: accuracy for potassium <span class="nowrap">&lt;3.5 mmol/L</span>, by age band (&lt;1, 1–11, 12–17 years) and by cause (acute shift or chronic deficit).</li>
-      <li data-s><strong>Step 1B (only if needed):</strong> transfer learning. We fine-tune the adult model with the pooled pediatric data, and test it on a site that it has not seen. Our hypothesis is that this needs fewer pediatric cases than a new model.</li>
-      <li data-s><strong>Step 2 (later, under a separate protocol):</strong> prospective monitoring during potassium correction.</li>
-    </ul>
+      <figure class="fig photo">
+        <picture>
+          <source media="screen and (min-width: 600px) and (prefers-color-scheme: dark)" srcset="img/ajkd2026_fig2_pooled_dark.png" width="1430" height="616">
+          <source media="(min-width: 600px)" srcset="img/ajkd2026_fig2_pooled.png" width="1430" height="616">
+          <source media="screen and (prefers-color-scheme: dark)" srcset="img/ajkd2026_fig2_pooled_stacked_dark.png" width="1089" height="1914">
+          <img src="img/ajkd2026_fig2_pooled_stacked.png" width="1089" height="1914" alt="Panel A: scatter plot of laboratory potassium against the ECG estimate, 466 pairs from 191 adults, with the identity line; repeated-measures correlation 0.847. Panel B: Bland-Altman plot; mean difference, laboratory minus ECG, -0.301 mmol/L; limits of agreement -1.194 to 0.592 mmol/L.">
+        </picture>
+        <figcaption>Adapted from Figure 2 of Ding JJ et al. Am J Kidney Dis 2026, by the authors; acute and chronic causes pooled. A: ECG estimate and laboratory potassium, 466 pairs from 191 adults during treatment. B: Bland-Altman plot.</figcaption>
+      </figure>
+    </section>
+      <p class="next"><button type="button" data-go="2">Next: 2. The pediatric study →</button></p>
+    </div>
+    <div class="panel" role="tabpanel" id="panel-2" aria-labelledby="tab-2" tabindex="0">
+    <section aria-labelledby="h-why">
+      <h2 id="h-why" data-s="h">Adult research has come this far. What about children?</h2>
+      <p data-s>To our knowledge, no deep-learning potassium model has been validated in children. The pediatric ECG differs from the adult ECG. Each centre sees few hypokalemic children, and severe values are rarer still. Pooling across centres is therefore necessary.</p>
     <figure class="fig">
-      <svg class="n" viewBox="0 0 320 406" width="320" height="406" role="img" aria-labelledby="f2n-t" aria-describedby="f2n-d">
-        <title id="f2n-t">The three steps</title>
-        <desc id="f2n-d">Step 1A (retrospective): apply the adult model, unchanged, to existing pediatric ECGs. Step 1B (only if needed): transfer learning from the adult model, then a test on a site that it has not seen. Step 2 (later, under a separate protocol): prospective monitoring during potassium correction.</desc>
-        <g font-size="16">
-          <rect class="bt" x="2" y="2" width="316" height="114" rx="12"/>
-          <text class="b ac" x="20" y="30" font-size="17">Step 1A</text>
-          <text class="m" x="20" y="52">Retrospective</text>
-          <text x="20" y="80">Apply the adult model, unchanged,</text>
-          <text x="20" y="101">to existing pediatric ECGs</text>
-          <path class="ln" d="M160 120v14"/><path class="hd" d="M153 134l7 10 7-10z"/>
-          <rect class="bo dash" x="2" y="146" width="316" height="114" rx="12"/>
-          <text class="b ac" x="20" y="174" font-size="17">Step 1B</text>
-          <text class="m" x="20" y="196">Only if needed</text>
-          <text x="20" y="224">Transfer learning from the adult</text>
-          <text x="20" y="245">model; test on an unseen site</text>
-          <path class="ln" d="M160 264v14"/><path class="hd" d="M153 278l7 10 7-10z"/>
-          <rect class="bx" x="2" y="290" width="316" height="114" rx="12"/>
-          <text class="b ac" x="20" y="318" font-size="17">Step 2</text>
-          <text class="m" x="20" y="340">Later, under a separate protocol</text>
-          <text x="20" y="368">Prospective monitoring during</text>
-          <text x="20" y="389">potassium correction</text>
-        </g>
-      </svg>
-      <svg class="w" viewBox="0 0 540 180" width="540" height="180" role="img" aria-labelledby="f2w-t" aria-describedby="f2w-d">
-        <title id="f2w-t">The three steps</title>
-        <desc id="f2w-d">Step 1A (retrospective): apply the adult model, unchanged, to existing pediatric ECGs. Step 1B (only if needed): transfer learning from the adult model, then a test on a site that it has not seen. Step 2 (later, under a separate protocol): prospective monitoring during potassium correction.</desc>
-        <g font-size="15" text-anchor="middle">
-          <rect class="bt" x="2" y="2" width="156" height="176" rx="12"/>
-          <text class="b ac" x="80" y="32" font-size="18">Step 1A</text>
-          <text class="m" x="80" y="54" font-size="14">Retrospective</text>
-          <text x="80" y="98">Apply the adult</text>
-          <text x="80" y="118">model, unchanged,</text>
-          <text x="80" y="138">to existing</text>
-          <text x="80" y="158">pediatric ECGs</text>
-          <path class="ln" d="M163 90h12"/><path class="hd" d="M175 83l10 7-10 7z"/>
-          <rect class="bo dash" x="192" y="2" width="156" height="176" rx="12"/>
-          <text class="b ac" x="270" y="32" font-size="18">Step 1B</text>
-          <text class="m" x="270" y="54" font-size="14">Only if needed</text>
-          <text x="270" y="94">Transfer learning</text>
-          <text x="270" y="114">from the adult</text>
-          <text x="270" y="142">model; test on</text>
-          <text x="270" y="162">an unseen site</text>
-          <path class="ln" d="M353 90h12"/><path class="hd" d="M365 83l10 7-10 7z"/>
-          <rect class="bx" x="382" y="2" width="156" height="176" rx="12"/>
-          <text class="b ac" x="460" y="32" font-size="18">Step 2</text>
-          <text class="m" x="460" y="54" font-size="14">Later, under a</text>
-          <text class="m" x="460" y="72" font-size="14">separate protocol</text>
-          <text x="460" y="98">Prospective</text>
-          <text x="460" y="118">monitoring during</text>
-          <text x="460" y="138">potassium</text>
-          <text x="460" y="158">correction</text>
-        </g>
-      </svg>
-      <figcaption>The three steps. Step 1B runs only if needed; Step 2 comes later, under a separate protocol.</figcaption>
-    </figure>
-  </section>
-
-  <section aria-labelledby="h-goal">
-    <h2 id="h-goal" data-s="h">The goal</h2>
-    <p class="goal" data-s>Earlier detection of abnormal potassium, and a painless way to follow the potassium trend. When the trend turns, a blood test confirms it, and the team treats. The ECG does not replace the blood test. Step 2 tests this goal in children.</p>
-    <figure class="fig">
-      <svg class="n" viewBox="0 0 320 308" width="320" height="308" role="img" aria-labelledby="fgn-t" aria-describedby="fgn-d">
-        <title id="fgn-t">The goal: a painless potassium trend</title>
-        <desc id="fgn-d">Illustration, not patient data. Dots are ECG estimates of potassium, one per ECG. Hollow squares are blood tests: fewer, and each result arrives some time after the sample is taken. Both follow the same trend. Potassium starts below 3.5 mmol/L and rises during correction, then rebounds suddenly above 5.5 mmol/L. A blood test confirms it, then the team treats.</desc>
+      <svg class="n" viewBox="0 0 320 300" width="320" height="300" role="img" aria-labelledby="fpn-t" aria-describedby="fpn-d">
+        <title id="fpn-t">Why we pool across centres</title>
+        <desc id="fpn-d">Illustration, not site data. Four centres, each with only a few hypokalemic children, shown as dots. Arrows lead from every centre into one pooled dataset: at least 150 hypokalemic and 450 normokalemic ECGs across all sites.</desc>
         <g font-size="15">
-          <circle class="dot" cx="10" cy="16" r="5"/>
-          <text class="m" x="22" y="21">One dot = one ECG estimate</text>
-          <rect class="lab" x="5" y="33" width="10" height="10"/>
-          <text class="m" x="22" y="43">Blood test, reported later</text>
-          <line class="th" x1="4" y1="98.0" x2="316" y2="98.0"/>
-          <text class="m" x="4" y="90.0">5.5 mmol/L</text>
-          <line class="th" x1="4" y1="170.0" x2="316" y2="170.0"/>
-          <text class="m" x="4" y="162.0">3.5 mmol/L</text>
-          <polyline class="tr" points="30,209.6 57,206.0 84,198.8 111,191.6 138,180.8 165,170.0 192,137.6 219,87.2 246,112.4 273,130.4 300,137.6"/>
-          <polyline class="lt" points="48.9,213.2 129.9,195.2 237.9,83.6 291.9,126.8"/>
-          <g class="dot"><circle cx="30" cy="209.6" r="5"/><circle cx="57" cy="206.0" r="5"/><circle cx="84" cy="198.8" r="5"/><circle cx="111" cy="191.6" r="5"/><circle cx="138" cy="180.8" r="5"/><circle cx="165" cy="170.0" r="5"/><circle cx="192" cy="137.6" r="5"/><circle cx="219" cy="87.2" r="5"/><circle cx="246" cy="112.4" r="5"/><circle cx="273" cy="130.4" r="5"/><circle cx="300" cy="137.6" r="5"/></g>
-          <line class="lag" x1="30" y1="213.2" x2="42.9" y2="213.2"/>
-          <rect class="lab" x="43.9" y="208.2" width="10" height="10"/>
-          <line class="lag" x1="111" y1="195.2" x2="123.9" y2="195.2"/>
-          <rect class="lab" x="124.9" y="190.2" width="10" height="10"/>
-          <line class="lag" x1="219" y1="83.6" x2="231.9" y2="83.6"/>
-          <rect class="lab" x="232.9" y="78.6" width="10" height="10"/>
-          <line class="lag" x1="273" y1="126.8" x2="285.9" y2="126.8"/>
-          <rect class="lab" x="286.9" y="121.8" width="10" height="10"/>
-          <circle class="ring" cx="219" cy="87.2" r="11"/>
-          <text class="b" x="203" y="68" text-anchor="end">Sudden rebound</text>
-          <line class="dl" x1="219" y1="101.2" x2="219" y2="218"/>
-          <path class="lk" d="M214 224v18a5 5 0 0 0 10 0v-18m-13 0h16m-13 10h10"/>
-          <line class="ax" x1="4" y1="254" x2="316" y2="254"/>
-          <text class="m" x="4" y="274">Time</text>
-          <text class="b" x="219" y="276" text-anchor="middle">Blood test confirms,</text>
-          <text class="b" x="219" y="298" text-anchor="middle">then treat</text>
+          <rect class="bx" x="2" y="2" width="154" height="70" rx="10"/>
+          <text class="b" x="16" y="28">Centre 1</text>
+          <circle class="dot" cx="22" cy="52" r="6"/><circle class="dot" cx="40" cy="52" r="6"/>
+          <rect class="bx" x="164" y="2" width="154" height="70" rx="10"/>
+          <text class="b" x="178" y="28">Centre 2</text>
+          <circle class="dot" cx="184" cy="52" r="6"/><circle class="dot" cx="202" cy="52" r="6"/><circle class="dot" cx="220" cy="52" r="6"/>
+          <rect class="bx" x="2" y="82" width="154" height="70" rx="10"/>
+          <text class="b" x="16" y="108">Centre 3</text>
+          <circle class="dot" cx="22" cy="132" r="6"/>
+          <rect class="bx" x="164" y="82" width="154" height="70" rx="10"/>
+          <text class="b" x="178" y="108">Centre 4</text>
+          <circle class="dot" cx="184" cy="132" r="6"/><circle class="dot" cx="202" cy="132" r="6"/>
+          <path class="ln" d="M160 158v28"/><path class="hd" d="M153 186l7 10 7-10z"/>
+          <rect class="bt" x="2" y="202" width="316" height="96" rx="12"/>
+          <text class="b ac" x="20" y="230" font-size="16">Pooled across all sites</text>
+          <text x="20" y="256">At least 150 hypokalemic ECGs</text>
+          <text x="20" y="280">and 450 normokalemic ECGs</text>
         </g>
       </svg>
-      <svg class="w" viewBox="0 0 540 256" width="540" height="256" role="img" aria-labelledby="fgw-t" aria-describedby="fgw-d">
-        <title id="fgw-t">The goal: a painless potassium trend</title>
-        <desc id="fgw-d">Illustration, not patient data. Dots are ECG estimates of potassium, one per ECG. Hollow squares are blood tests: fewer, and each result arrives some time after the sample is taken. Both follow the same trend. Potassium starts below 3.5 mmol/L and rises during correction, then rebounds suddenly above 5.5 mmol/L. A blood test confirms it, then the team treats.</desc>
+      <svg class="w" viewBox="0 0 540 252" width="540" height="252" role="img" aria-labelledby="fpw-t" aria-describedby="fpw-d">
+        <title id="fpw-t">Why we pool across centres</title>
+        <desc id="fpw-d">Illustration, not site data. Four centres, each with only a few hypokalemic children, shown as dots. Arrows lead from every centre into one pooled dataset: at least 150 hypokalemic and 450 normokalemic ECGs across all sites.</desc>
         <g font-size="15">
-          <circle class="dot" cx="10" cy="16" r="5"/>
-          <text class="m" x="22" y="21">One dot = one ECG estimate</text>
-          <rect class="lab" x="267" y="11" width="10" height="10"/>
-          <text class="m" x="284" y="21">Blood test, reported later</text>
-          <line class="th" x1="4" y1="77.0" x2="536" y2="77.0"/>
-          <text class="m" x="4" y="69.0">5.5 mmol/L</text>
-          <line class="th" x1="4" y1="153.0" x2="536" y2="153.0"/>
-          <text class="m" x="4" y="145.0">3.5 mmol/L</text>
-          <polyline class="tr" points="70,194.8 114,191.0 158,183.4 202,175.8 246,164.4 290,153.0 334,118.8 378,65.6 422,92.2 466,111.2 510,118.8"/>
-          <polyline class="lt" points="100.8,198.6 232.8,179.6 408.8,61.8 496.8,107.4"/>
-          <g class="dot"><circle cx="70" cy="194.8" r="5"/><circle cx="114" cy="191.0" r="5"/><circle cx="158" cy="183.4" r="5"/><circle cx="202" cy="175.8" r="5"/><circle cx="246" cy="164.4" r="5"/><circle cx="290" cy="153.0" r="5"/><circle cx="334" cy="118.8" r="5"/><circle cx="378" cy="65.6" r="5"/><circle cx="422" cy="92.2" r="5"/><circle cx="466" cy="111.2" r="5"/><circle cx="510" cy="118.8" r="5"/></g>
-          <line class="lag" x1="70" y1="198.6" x2="94.8" y2="198.6"/>
-          <rect class="lab" x="95.8" y="193.6" width="10" height="10"/>
-          <line class="lag" x1="202" y1="179.6" x2="226.8" y2="179.6"/>
-          <rect class="lab" x="227.8" y="174.6" width="10" height="10"/>
-          <line class="lag" x1="378" y1="61.8" x2="402.8" y2="61.8"/>
-          <rect class="lab" x="403.8" y="56.8" width="10" height="10"/>
-          <line class="lag" x1="466" y1="107.4" x2="490.8" y2="107.4"/>
-          <rect class="lab" x="491.8" y="102.4" width="10" height="10"/>
-          <circle class="ring" cx="378" cy="65.6" r="11"/>
-          <text class="b" x="362" y="48" text-anchor="end">Sudden rebound</text>
-          <line class="dl" x1="378" y1="79.6" x2="378" y2="186"/>
-          <path class="lk" d="M373 192v18a5 5 0 0 0 10 0v-18m-13 0h16m-13 10h10"/>
-          <line class="ax" x1="4" y1="224" x2="536" y2="224"/>
-          <text class="m" x="4" y="248">Time</text>
-          <text class="b" x="378" y="248" text-anchor="middle">Blood test confirms, then treat</text>
+          <rect class="bx" x="2" y="2" width="122" height="76" rx="10"/>
+          <text class="b" x="16" y="30">Centre 1</text>
+          <circle class="dot" cx="22" cy="56" r="6"/><circle class="dot" cx="40" cy="56" r="6"/>
+          <path class="ln" d="M63 84L245 150"/>
+          <rect class="bx" x="140" y="2" width="122" height="76" rx="10"/>
+          <text class="b" x="154" y="30">Centre 2</text>
+          <circle class="dot" cx="160" cy="56" r="6"/><circle class="dot" cx="178" cy="56" r="6"/><circle class="dot" cx="196" cy="56" r="6"/>
+          <path class="ln" d="M201 84L262 150"/>
+          <rect class="bx" x="278" y="2" width="122" height="76" rx="10"/>
+          <text class="b" x="292" y="30">Centre 3</text>
+          <circle class="dot" cx="298" cy="56" r="6"/>
+          <path class="ln" d="M339 84L278 150"/>
+          <rect class="bx" x="416" y="2" width="122" height="76" rx="10"/>
+          <text class="b" x="430" y="30">Centre 4</text>
+          <circle class="dot" cx="436" cy="56" r="6"/><circle class="dot" cx="454" cy="56" r="6"/>
+          <path class="ln" d="M477 84L295 150"/>
+          <path class="hd" d="M262 150l8 11 8-11z"/>
+          <rect class="bt" x="2" y="166" width="536" height="84" rx="12"/>
+          <text class="b ac" x="270" y="198" font-size="17" text-anchor="middle">Pooled across all sites</text>
+          <text x="270" y="228" text-anchor="middle">At least 150 hypokalemic and 450 normokalemic ECGs</text>
         </g>
       </svg>
-      <figcaption>Illustration, not patient data.</figcaption>
+      <figcaption>Illustration, not site data. Each centre sees few hypokalemic children; pooled, the sites reach the target.</figcaption>
     </figure>
-  </section>
+    </section>
+    <section aria-labelledby="h-start">
+      <h2 id="h-start" data-s="h">The proposed study: we start from the adult model</h2>
+      <ul>
+        <li data-s><strong>Step 1A (retrospective):</strong> apply the adult model, unchanged, to existing pediatric ECGs. Children aged 28 days to 17 years; records from 2019 to 2025; a digital <span class="nowrap">12-lead</span> ECG with a laboratory serum or plasma potassium within 60 minutes. Main outcome: accuracy for potassium <span class="nowrap">&lt;3.5 mmol/L</span>, by age band (&lt;1, 1–11, 12–17 years) and by cause (acute shift or chronic deficit).</li>
+        <li data-s><strong>Step 1B (only if needed):</strong> transfer learning. We fine-tune the adult model with the pooled pediatric data, and test it on a site that it has not seen. Our hypothesis is that this needs fewer pediatric cases than a new model.</li>
+        <li data-s><strong>Step 2 (later, under a separate protocol):</strong> prospective monitoring during potassium correction.</li>
+      </ul>
+      <figure class="fig">
+        <svg class="n" viewBox="0 0 320 406" width="320" height="406" role="img" aria-labelledby="f2n-t" aria-describedby="f2n-d">
+          <title id="f2n-t">The three steps</title>
+          <desc id="f2n-d">Step 1A (retrospective): apply the adult model, unchanged, to existing pediatric ECGs. Step 1B (only if needed): transfer learning from the adult model, then a test on a site that it has not seen. Step 2 (later, under a separate protocol): prospective monitoring during potassium correction.</desc>
+          <g font-size="16">
+            <rect class="bt" x="2" y="2" width="316" height="114" rx="12"/>
+            <text class="b ac" x="20" y="30" font-size="17">Step 1A</text>
+            <text class="m" x="20" y="52">Retrospective</text>
+            <text x="20" y="80">Apply the adult model, unchanged,</text>
+            <text x="20" y="101">to existing pediatric ECGs</text>
+            <path class="ln" d="M160 120v14"/><path class="hd" d="M153 134l7 10 7-10z"/>
+            <rect class="bo dash" x="2" y="146" width="316" height="114" rx="12"/>
+            <text class="b ac" x="20" y="174" font-size="17">Step 1B</text>
+            <text class="m" x="20" y="196">Only if needed</text>
+            <text x="20" y="224">Transfer learning from the adult</text>
+            <text x="20" y="245">model; test on an unseen site</text>
+            <path class="ln" d="M160 264v14"/><path class="hd" d="M153 278l7 10 7-10z"/>
+            <rect class="bx" x="2" y="290" width="316" height="114" rx="12"/>
+            <text class="b ac" x="20" y="318" font-size="17">Step 2</text>
+            <text class="m" x="20" y="340">Later, under a separate protocol</text>
+            <text x="20" y="368">Prospective monitoring during</text>
+            <text x="20" y="389">potassium correction</text>
+          </g>
+        </svg>
+        <svg class="w" viewBox="0 0 540 180" width="540" height="180" role="img" aria-labelledby="f2w-t" aria-describedby="f2w-d">
+          <title id="f2w-t">The three steps</title>
+          <desc id="f2w-d">Step 1A (retrospective): apply the adult model, unchanged, to existing pediatric ECGs. Step 1B (only if needed): transfer learning from the adult model, then a test on a site that it has not seen. Step 2 (later, under a separate protocol): prospective monitoring during potassium correction.</desc>
+          <g font-size="15" text-anchor="middle">
+            <rect class="bt" x="2" y="2" width="156" height="176" rx="12"/>
+            <text class="b ac" x="80" y="32" font-size="18">Step 1A</text>
+            <text class="m" x="80" y="54" font-size="14">Retrospective</text>
+            <text x="80" y="98">Apply the adult</text>
+            <text x="80" y="118">model, unchanged,</text>
+            <text x="80" y="138">to existing</text>
+            <text x="80" y="158">pediatric ECGs</text>
+            <path class="ln" d="M163 90h12"/><path class="hd" d="M175 83l10 7-10 7z"/>
+            <rect class="bo dash" x="192" y="2" width="156" height="176" rx="12"/>
+            <text class="b ac" x="270" y="32" font-size="18">Step 1B</text>
+            <text class="m" x="270" y="54" font-size="14">Only if needed</text>
+            <text x="270" y="94">Transfer learning</text>
+            <text x="270" y="114">from the adult</text>
+            <text x="270" y="142">model; test on</text>
+            <text x="270" y="162">an unseen site</text>
+            <path class="ln" d="M353 90h12"/><path class="hd" d="M365 83l10 7-10 7z"/>
+            <rect class="bx" x="382" y="2" width="156" height="176" rx="12"/>
+            <text class="b ac" x="460" y="32" font-size="18">Step 2</text>
+            <text class="m" x="460" y="54" font-size="14">Later, under a</text>
+            <text class="m" x="460" y="72" font-size="14">separate protocol</text>
+            <text x="460" y="98">Prospective</text>
+            <text x="460" y="118">monitoring during</text>
+            <text x="460" y="138">potassium</text>
+            <text x="460" y="158">correction</text>
+          </g>
+        </svg>
+        <figcaption>The three steps. Step 1B runs only if needed; Step 2 comes later, under a separate protocol.</figcaption>
+      </figure>
+    </section>
+    <section aria-labelledby="h-site">
+      <h2 id="h-site" data-s="h">What a site does in Step 1</h2>
+      <ol>
+        <li data-s>Obtains local ethics approval.</li>
+        <li data-s>Removes names, ID numbers and all dates before any data leave the hospital.</li>
+        <li data-s>Sends the de-identified data by secure transfer.</li>
+      </ol>
+      <p data-s>The analysis runs centrally in Taiwan. Nothing needs to be installed at your hospital. Each site receives the results for its own ECGs.</p>
+    </section>
 
-  <section aria-labelledby="h-site">
-    <h2 id="h-site" data-s="h">What a site does in Step 1</h2>
-    <ol>
-      <li data-s>Obtains local ethics approval.</li>
-      <li data-s>Removes names, ID numbers and all dates before any data leave the hospital.</li>
-      <li data-s>Sends the de-identified data by secure transfer.</li>
-    </ol>
-    <p data-s>The analysis runs centrally in Taiwan. Nothing needs to be installed at your hospital. Each site receives the results for its own ECGs.</p>
-  </section>
+    <section aria-labelledby="h-target">
+      <h2 id="h-target" data-s="h">Target</h2>
+      <p data-s>At least 150 hypokalemic and 450 normokalemic ECGs in total, pooled across all sites. There is no quota for any single site.</p>
+    </section>
 
-  <section aria-labelledby="h-target">
-    <h2 id="h-target" data-s="h">Target</h2>
-    <p data-s>At least 150 hypokalemic and 450 normokalemic ECGs in total, pooled across all sites. There is no quota for any single site.</p>
-  </section>
-
-  <section aria-labelledby="h-agree">
-    <h2 id="h-agree" data-s="h">To be agreed with participating sites</h2>
-    <p data-s>The data transfer agreement, authorship rules (ICMJE criteria), the pre-specified success criteria, and the timeline.</p>
-  </section>
+    <section aria-labelledby="h-agree">
+      <h2 id="h-agree" data-s="h">To be agreed with participating sites</h2>
+      <p data-s>The data transfer agreement, authorship rules (ICMJE criteria), the pre-specified success criteria, and the timeline.</p>
+    </section>
+    </div>
+  </div>
 
   <div class="cta-end">
     <a class="btn" data-survey href="mailto:jamesdin1124@gmail.com?subject=Paediatric%20AI-ECG%20Potassium%20Study">Survey opens soon — email&nbsp;us</a>
@@ -626,7 +735,7 @@ figcaption { margin-top: 10px; color: var(--muted); font-size: 0.9rem; line-heig
 <div class="foot">
   <p>Investigator-led proposal; not an official page of any hospital.</p>
   <p>This page sets no cookies and has no analytics or tracking. GitHub, which hosts it, logs visitors' IP addresses for security. The survey is a Google Form. It asks for your professional contact details and about your hospital; it does not ask for patient data.</p>
-  <p>Last updated: <time datetime="2026-10-08">8 October 2026</time></p>
+  <p>Last updated: <time datetime="2026-10-09">9 October 2026</time></p>
 </div>
 </footer>
 </body>
